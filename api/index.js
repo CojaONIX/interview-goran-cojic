@@ -3,22 +3,19 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express()
-const port = 3000
+const port = 3001
 
 let todos = [{
-        "id": "1",
-        "title": "Test1",
-        "finished": false,
+        "text": "Test1",
+        "isDone": false,
     },
     {
-        "id": "2",
-        "title": "Test2",
-        "finished": true,
+        "text": "Test2",
+        "isDone": true,
     },
     {
-        "id": "3",
-        "title": "Test3",
-        "finished": false,
+        "text": "Test3",
+        "isDone": false,
     }];
 
 app.use(cors());
@@ -30,20 +27,15 @@ app.get('/', (req, res) => {
     res.send('todo API');
 });
 
-app.get('/todos', (req, res) => {
+app.get('/todo', (req, res) => {
     res.json(todos);
 });
 
 app.get('/todo/:id', (req, res) => {
-    // reading id from the URL
     const id = req.params.id;
-
-    // searching todos for the id
-    for (let todo of todos) {
-        if (todo.id === id) {
-            res.json(todo);
-            return;
-        }
+    if(todos[id]) {
+        res.json(todos[id]);
+        return
     }
 
     // sending 404 when not found something is a good practice
@@ -51,47 +43,33 @@ app.get('/todo/:id', (req, res) => {
 });
 
 app.post('/todo', (req, res) => {
-    const todo = req.body;
-
-    // output the todo to the console for debugging
-    console.log(todo);
+    const todo =  req.body;
     todos.push(todo);
+    console.log(todo);    
 
     res.send('todo is added to the database');
 });
 
 app.delete('/todo/:id', (req, res) => {
-    // reading id from the URL
     const id = req.params.id;
+    todos.splice(id, 1);
 
     // remove item from the todos array
-    todos = todos.filter(i => {
-        if (i.id !== id) {
-            return true;
-        }
+    // todos = todos.filter(i => {
+    //     if (i.id !== id) {
+    //         return true;
+    //     }
 
-        return false;
-    });
+    //     return false;
+    // });
 
     // sending 404 when not found something is a good practice
     res.send('todo is deleted');
 });
 
-app.post('/todo/:id', (req, res) => {
-    // reading id from the URL
+app.put('/todo/:id', (req, res) => {
     const id = req.params.id;
-    const newTodo = req.body;
-
-    // remove item from the todos array
-    for (let i = 0; i < todos.length; i++) {
-        let todo = todos[i]
-
-        if (todo.id === id) {
-            todos[i] = newTodo;
-        }
-    }
-
-    // sending 404 when not found something is a good practice
+    todos[id]['isDone'] = !todos[id]['isDone'];
     res.send('todo is edited');
 });
 

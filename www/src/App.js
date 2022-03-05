@@ -1,65 +1,26 @@
-// import logo from './logo.svg';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <h1>JEEEEEEEEEEEEEE</h1>
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-restricted-globals */
 import React, { Component } from 'react';
 import './App.css';
 import axios from 'axios';
-import { Button, Container, Card, Row } from 'react-bootstrap'
 
 class App extends Component {
   constructor(props) {
     super(props)
       this.state = {
-        setBookName: '',
-        setReview: '',
-        fetchData: [],
-        reviewUpdate: ''
+        text: '',
+        fetchData: []
       }
   }
 
   handleChange = (event) => {
-    let nam = event.target.name;
-    let val = event.target.value
     this.setState({
-      [nam]: val
-    })
-  }
-
-  handleChange2 = (event) => {
-    this.setState({
-      reviewUpdate: event.target.value
+      text: event.target.value
     })
   }
 
   componentDidMount() {
-    axios.get("/api/get")
+    axios.get("http://localhost:3001/todo")
       .then((response) => {
         this.setState({
           fetchData: response.data
@@ -68,58 +29,44 @@ class App extends Component {
   }
 
   submit = () => {
-    axios.post('/api/insert', this.state)
-      .then(() => { alert('success post') })
+    axios.post('http://localhost:3001/todo', {'text': this.state.text, "isDone": false})
     console.log(this.state)
     document.location.reload();
   }
 
   delete = (id) => {
-    if (confirm("Do you want to delete? ")) {
-      axios.delete(`/api/delete/${id}`)
+    if (confirm("Do you want to delete? " + id)) {
+      axios.delete(`http://localhost:3001/todo/${id}`)
       document.location.reload()
     }
   }
 
   edit = (id) => {
-    axios.put(`/api/update/${id}`, this.state)
-    document.location.reload();
+    axios.put(`http://localhost:3001/todo/${id}`)
+    //document.location.reload();
   }
-  render() {
 
-    let card = this.state.fetchData.map((val, key) => {
+
+  render() {
+    let todoList = this.state.fetchData.map((val, key) => {
       return (
-        <React.Fragment>
-          <Card style={{ width: '18rem' }} className='m-2'>
-            <Card.Body>
-              <Card.Title>{val.book_name}</Card.Title>
-              <Card.Text>
-                {val.book_review}
-              </Card.Text>
-              <input name='reviewUpdate' onChange={this.handleChange2} placeholder='Update Review' ></input>
-              <Button className='m-2' onClick={() => { this.edit(val.id) }}>Update</Button>
-              <Button onClick={() => { this.delete(val.id) }}>Delete</Button>
-            </Card.Body>
-          </Card>
-        </React.Fragment>
+        <div>
+          <input id={key} name='id' type="checkbox" defaultChecked={val.isDone} onChange={() => { this.edit(key) }}></input> 
+          <label for={key} style={{margin: "10px", width: "500px", textAlign: "left"}}>{val.text}</label>
+          <button onClick={() => { this.delete(key) }}>D</button>
+        </div>
       )
     })
 
     return (
       <div className='App'>
-        <h1>Dockerized Fullstack React Application</h1>
+        <h1>Todo list</h1>
         <div className='form'>
-          <input name='setBookName' placeholder='Enter Book Name' onChange={this.handleChange} />
-          <input name='setReview' placeholder='Enter Review' onChange={this.handleChange} />
+          <input name='text' placeholder='Enter Todo' onChange={this.handleChange} />
         </div>
+        <button onClick={() => { this.submit() }}>Submit</button>
 
-        <Button className='my-2' variant="primary" onClick={this.submit}>Submit</Button> <br /><br/>
-
-        <Container>
-          <Row>
-            {card}
-          </Row>
-        </Container>
+        <div>{todoList}</div>
       </div>
     );
   }
