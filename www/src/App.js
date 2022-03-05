@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import axios from 'axios';
+import { TextInput, Button, Icon, Checkbox } from 'react-materialize';
 
 class App extends Component {
   constructor(props) {
@@ -50,10 +51,24 @@ class App extends Component {
   render() {
     let todoList = this.state.fetchData.map((val, key) => {
       return (
-        <div>
-          <input id={key} name='id' type="checkbox" defaultChecked={val.isDone} onChange={() => { this.edit(key) }}></input> 
-          <label for={key} style={{margin: "10px", width: "500px", textAlign: "left"}}>{val.text}</label>
-          <button onClick={() => { this.delete(key) }}>D</button>
+        <div className="todo">
+          <Checkbox
+            id={'todo' + key}
+            label={val.text}
+            value={'' + key}
+            checked={val.isDone}
+            onChange={() => { this.edit(key) }}
+          />
+
+          <Button
+            className="red"
+            floating
+            icon={<Icon>remove_circle</Icon>}
+            node="button"
+            waves="light"
+            onClick={() => { this.delete(key) }}
+          />
+
         </div>
       )
     })
@@ -62,12 +77,27 @@ class App extends Component {
       <div className='App'>
         <h1>Todo list</h1>
         <div className='form'>
-          <input name='text' placeholder='Enter Todo' onChange={this.handleChange} />
+
+          <TextInput
+            id='text'
+            label='Enter Todo'
+            onChange={this.handleChange}
+          />
+          <Button
+            className="blue"
+            floating
+            icon={<Icon>add</Icon>}
+            node="button"
+            waves="light"
+            onClick={() => { this.submit() }}
+          />          
         </div>
-        <button onClick={() => { this.submit() }}>Submit</button>
+
 
         <div>{todoList}</div>
+
       </div>
+      
     );
   }
 }

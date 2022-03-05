@@ -44,7 +44,7 @@ app.get('/todo/:id', (req, res) => {
 
 app.post('/todo', (req, res) => {
     const todo =  req.body;
-    todos.push(todo);
+    todos.unshift(todo);
     console.log(todo);    
 
     res.send('todo is added to the database');
