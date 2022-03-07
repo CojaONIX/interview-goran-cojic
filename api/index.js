@@ -5,7 +5,15 @@ const cors = require('cors');
 const app = express()
 const port = 3001
 
-let todos = [{
+let todos = [];
+
+app.use(cors());
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.get('/', (req, res) => {
+    todos = [{
         "text": "Test1",
         "isDone": false,
     },
@@ -16,19 +24,15 @@ let todos = [{
     {
         "text": "Test3",
         "isDone": false,
-    }];
-
-app.use(cors());
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.get('/', (req, res) => {
-    res.send('todo API');
+    }];    
+    res.send(todos);
 });
 
 app.get('/todo', (req, res) => {
-    res.json(todos);
+    res.json({
+        apiMsg: 'get all todos',
+        todos: todos
+    });
 });
 
 app.get('/todo/:id', (req, res) => {
@@ -44,27 +48,21 @@ app.get('/todo/:id', (req, res) => {
 
 app.post('/todo', (req, res) => {
     const todo =  req.body;
-    todos.unshift(todo);
-    console.log(todo);    
+    todo.isDone = false;
+    todos.push(todo);
 
-    res.send('todo is added to the database');
+    res.send('todo is added to the list');
 });
 
 app.delete('/todo/:id', (req, res) => {
     const id = req.params.id;
     todos.splice(id, 1);
 
-    // remove item from the todos array
-    // todos = todos.filter(i => {
-    //     if (i.id !== id) {
-    //         return true;
-    //     }
-
-    //     return false;
-    // });
-
-    // sending 404 when not found something is a good practice
-    res.send('todo is deleted');
+    //res.send('todo is deleted');
+    res.json({
+        apiMsg: 'todo is deleted',
+        todos: todos
+    });
 });
 
 app.put('/todo/:id', (req, res) => {
